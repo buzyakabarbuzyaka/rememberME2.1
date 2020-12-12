@@ -1,3 +1,5 @@
 .idea
 venv
-db
+postgres-data
+__pycache__
+.secret
