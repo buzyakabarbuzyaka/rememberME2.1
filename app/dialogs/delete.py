@@ -61,6 +61,11 @@ def card_delete_endpoint(update: Update, context: CallbackContext):
     return WAITING_DELETE_DECISION
 
 
+def no_cards_endpoint(update: Update, context: CallbackContext):
+    update.message.reply_text("У тебя пока нету карточек(")
+    return ConversationHandler.END
+
+
 def start_delete(update: Update, context: CallbackContext) -> int:
     db = next(get_db())
     telegram_id = update.effective_chat.username
@@ -70,14 +75,12 @@ def start_delete(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Ты новенький. Зарегистрировал тебя!)")
         user = schemas.UserCreate(telegram_id=telegram_id)
         crud.create_user(db=db, user=user)
-        update.message.reply_text("У тебя пока нету карточек(")
-        return ConversationHandler.END
+        return no_cards_endpoint(update, context)
     else:
         update.message.reply_text("Снова здарова")
         card_names_list = list_card_names(db, telegram_id)
         if not card_names_list:
-            update.message.reply_text("У тебя пока нету карточек(")
-            return ConversationHandler.END
+            return no_cards_endpoint(update, context)
         else:
             return card_delete_endpoint(update, context)
 
@@ -95,6 +98,9 @@ def delete_card(update: Update, context: CallbackContext):
 
     else:
         update.message.reply_text(f"Удаляю {card_name}:")
+        crud.delete_card(db=db, card_name=card_name, telegram_id=telegram_id)
+        if not list_card_names(db=db, telegram_id=telegram_id):
+            return no_cards_endpoint(update, context)
 
         update.message.reply_text(
             "Продолжить удаление?",

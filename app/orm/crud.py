@@ -57,10 +57,15 @@ def get_card_id_by_name(db: Session, telegram_id: str, card_name: str):
 
 
 def user_card_question_exists(db: Session, telegram_id: str, card_name: str, question: str):
-    user_id = get_user_by_telegram_id(db=db, telegram_id=telegram_id).id
     card_id = get_card_id_by_name(db=db, telegram_id=telegram_id, card_name=card_name).id
-
     return db.query(models.Item).filter_by(card_id=card_id).filter_by(question=question).all()
+
+
+def delete_card(db: Session, telegram_id: str, card_name: str):
+    card_id = get_card_id_by_name(db=db, telegram_id=telegram_id, card_name=card_name).id
+    query = db.query(models.Card).filter_by(id=card_id).delete()
+    db.commit()
+    return query
 
 
 def create_card_item(db: Session, item: schemas.ItemBase, telegram_id: str, card_name: str):
