@@ -3,6 +3,8 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
+from app.settings import APP_PORT
+
 from app.orm import models, crud, schemas
 from app.orm.database import SessionLocal, engine
 
@@ -82,4 +84,4 @@ def create_item_for_user(
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=APP_PORT)

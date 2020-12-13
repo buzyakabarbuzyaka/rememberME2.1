@@ -1,21 +1,11 @@
 import logging
 import os
-# from os.path import join, dirname
-# from dotenv import load_dotenv
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
-# load .env
-# env = load_dotenv()
-
-# load .secret
-# secret_path = join(dirname(__file__), '..', '.secret')
-# load_dotenv(secret_path)
-
-# env from docker-compose env
-
-APP_PORT = os.getenv('APP_PORT')
+APP_PORT = int(os.getenv('APP_PORT'))
+TOKEN = os.getenv('TOKEN')
 
 
 class PostgresConfiguration:

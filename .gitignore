@@ -2,4 +2,4 @@
 venv
 postgres-data
 __pycache__
-.secret
+.secret*

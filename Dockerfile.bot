@@ -1,0 +1,9 @@
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
+COPY ./requirements-bot.txt /requirements.txt
+WORKDIR /
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+EXPOSE ${APP_PORT}
+CMD python3 -m app.cmd.bot

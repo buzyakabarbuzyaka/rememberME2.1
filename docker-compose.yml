@@ -7,7 +7,7 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     env_file:
       - .env
-      - .secret
+      - .secret_base
     volumes:
       - ./db:/var/lib/postgresql/data
     networks:
@@ -24,12 +24,31 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     env_file:
       - .env
-      - .secret
+      - .secret_base
     volumes:
       - ./app:/app
     networks:
       - stat_network
 
+  user-bot:
+    build:
+      dockerfile: Dockerfile.bot
+      context: .
+    links:
+      - user-db
+    depends_on:
+      - user-db
+    restart: always
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    env_file:
+      - .env
+      - .secret_base
+      - .secret_bot
+    volumes:
+      - ./app:/app
+    networks:
+      - stat_network
 networks:
   stat_network:
     name: stat_network
