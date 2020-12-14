@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 from app.orm import crud, schemas
 
-from app.dialogs.utills import get_db, list_card_names
+from app.dialogs.utills import get_db, list_card_names, done
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def start_new(update: Update, context: CallbackContext) -> int:
             card_list_msg = '\t- ' + '\n\t- '.join(card_list)
             update.message.reply_text(f"Уже созданные тобой карточки:\n{card_list_msg}")
         else:
-            update.message.reply_text(f"Ты пока не создал ни одной карточки(\n{card_list_msg}")
+            update.message.reply_text(f"Ты пока не создал ни одной карточки(")
 
     update.message.reply_text(
         "Меню создания карточки:",
@@ -152,10 +152,7 @@ def creating_answer(update: Update, context: CallbackContext):
         return item_creation_decision(update, context)
 
 
-def done(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text('---End---')
-    context.user_data.clear()
-    return ConversationHandler.END
+
 
 
 conv_handler = ConversationHandler(

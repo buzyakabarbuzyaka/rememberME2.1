@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 from app.orm import crud, schemas
 
-from app.dialogs.utills import get_db, list_card_names, no_cards_endpoint
+from app.dialogs.utills import get_db, list_card_names, no_cards_endpoint, done
 
 logger = logging.getLogger(__name__)
 
@@ -92,12 +92,6 @@ def continue_decision(update: Update, context: CallbackContext):
 
     if reply == "Завершить":
         return ConversationHandler.END
-
-
-def done(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text('---End---')
-    context.user_data.clear()
-    return ConversationHandler.END
 
 
 conv_handler = ConversationHandler(

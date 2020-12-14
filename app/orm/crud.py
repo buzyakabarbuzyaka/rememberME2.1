@@ -84,5 +84,17 @@ def get_items_for_user_card(db: Session, telegram_id: str, card_name: str, skip:
     return db.query(models.Item).filter_by(card_id=card_id).offset(skip).limit(limit).all()
 
 
+def _get_items_for_user_card(db: Session, telegram_id: str, card_name: str):
+    user_id = get_user_by_telegram_id(db=db, telegram_id=telegram_id).id
+    card_id = db.query(models.Card).filter_by(user_id=user_id, card_name=card_name).first().id
+    return db.query(models.Item).filter_by(card_id=card_id).all()
+
+
+def get_item_for_user_card(db: Session, telegram_id: str, card_name: str, question: str):
+    user_id = get_user_by_telegram_id(db=db, telegram_id=telegram_id).id
+    card_id = db.query(models.Card).filter_by(user_id=user_id, card_name=card_name).first().id
+    return db.query(models.Item).filter_by(card_id=card_id).filter_by(question=question).first()
+
+
 def get_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Item).offset(skip).limit(limit).all()
