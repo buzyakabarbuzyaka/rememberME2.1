@@ -2,17 +2,7 @@ from app.settings import TOKEN
 import logging
 
 from telegram.ext import Updater
-from app.orm.database import SessionLocal
-from app.dialogs import remember, delete
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from app.dialogs import new, delete, view
 
 
 # Enable logging
@@ -27,8 +17,9 @@ def main() -> None:
     updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(remember.conv_handler)
+    dispatcher.add_handler(new.conv_handler)
     dispatcher.add_handler(delete.conv_handler)
+    dispatcher.add_handler(view.conv_handler)
 
     updater.start_polling()
     updater.idle()

@@ -1,30 +1,15 @@
 import logging
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
     CallbackContext,
 )
-from app.orm import models, crud, schemas
-from app.orm.database import SessionLocal, engine
+from app.orm import crud, schemas
 
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
+from app.dialogs.utills import get_db, list_card_names, no_cards_endpoint
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +21,6 @@ WAITING_CONTINUE, \
 end_deleting_items_kbd = [["Продолжить", "Завершить"]]
 
 end_deleting_items = ReplyKeyboardMarkup(end_deleting_items_kbd, one_time_keyboard=True)
-
-
-def list_card_names(db, telegram_id):
-    dbs_card_list = crud._get_cards_for_user(db=db, telegram_id=telegram_id)
-    return [card.card_name for card in dbs_card_list]
 
 
 def make_card_names_kbd(card_names_list):
@@ -59,11 +39,6 @@ def card_delete_endpoint(update: Update, context: CallbackContext):
         reply_markup=card_names,
     )
     return WAITING_DELETE_DECISION
-
-
-def no_cards_endpoint(update: Update, context: CallbackContext):
-    update.message.reply_text("У тебя пока нету карточек(")
-    return ConversationHandler.END
 
 
 def start_delete(update: Update, context: CallbackContext) -> int:

@@ -1,45 +1,26 @@
 import logging
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
     CallbackContext,
 )
-from app.orm import models, crud, schemas
-from app.orm.database import SessionLocal, engine
+from app.orm import crud, schemas
 
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
+from app.dialogs.utills import get_db, list_card_names
 
 logger = logging.getLogger(__name__)
 
 CARD_CREATION_CHOICE, \
-CREATING_NEW_CARD, \
-CHANGING_OLD_CARD, \
 TYPING_NEW_CARD_NAME, \
-TYPING_OLD_CARD_NAME, \
 CREATING_QUESTION, \
 CREATING_ANSWER, \
 ITEM_CREATION_WAITING_REPLY, \
-LIST_CARD, \
-    = range(9)
+    = range(5)
 
-start_creation_kbd = [['Создать новую', 'Изменить'],
+start_creation_kbd = [['Создать новую'],
                       ["Выход"]]
 
 end_creating_items_kbd = [["Продолжить", "Завершить"]]
@@ -48,12 +29,7 @@ start_creation = ReplyKeyboardMarkup(start_creation_kbd, one_time_keyboard=True)
 end_creating_items = ReplyKeyboardMarkup(end_creating_items_kbd, one_time_keyboard=True)
 
 
-def list_card_names(db, telegram_id):
-    dbs_card_list = crud._get_cards_for_user(db=db, telegram_id=telegram_id)
-    return [card.card_name for card in dbs_card_list]
-
-
-def start_remember(update: Update, context: CallbackContext) -> int:
+def start_new(update: Update, context: CallbackContext) -> int:
     db = next(get_db())
     telegram_id = update.effective_chat.username
     db_user = crud.get_user_by_telegram_id(db, telegram_id=telegram_id)
@@ -64,9 +40,12 @@ def start_remember(update: Update, context: CallbackContext) -> int:
         crud.create_user(db=db, user=user)
     else:
         update.message.reply_text("Снова здарова")
-
-        card_list_msg = '\t- ' + '\n\t- '.join(list_card_names(db=db, telegram_id=telegram_id))
-        update.message.reply_text(f"Уже созданные тобой карточки:\n{card_list_msg}")
+        card_list = list_card_names(db=db, telegram_id=telegram_id)
+        if card_list:
+            card_list_msg = '\t- ' + '\n\t- '.join(card_list)
+            update.message.reply_text(f"Уже созданные тобой карточки:\n{card_list_msg}")
+        else:
+            update.message.reply_text(f"Ты пока не создал ни одной карточки(\n{card_list_msg}")
 
     update.message.reply_text(
         "Меню создания карточки:",
@@ -82,9 +61,6 @@ def card_creation_choice(update: Update, context: CallbackContext) -> int:
     if text == 'Создать новую':
         update.message.reply_text(f'Введите уникальное имя катрочки:')
         return TYPING_NEW_CARD_NAME
-
-    if text == 'Изменить':
-        return TYPING_OLD_CARD_NAME
 
 
 def new_card_name_process(update: Update, context: CallbackContext) -> int:
@@ -183,7 +159,7 @@ def done(update: Update, context: CallbackContext) -> int:
 
 
 conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('remember', start_remember)],
+    entry_points=[CommandHandler('new', start_new)],
     states={
         CARD_CREATION_CHOICE: [
             MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Выход$')), card_creation_choice),
@@ -200,9 +176,6 @@ conv_handler = ConversationHandler(
         ITEM_CREATION_WAITING_REPLY: [
             MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Выход$')),
                            item_creation_decision_reply)
-        ],
-        TYPING_OLD_CARD_NAME: [
-
         ],
     },
     fallbacks=[MessageHandler(Filters.regex('^Выход$'), done)],
