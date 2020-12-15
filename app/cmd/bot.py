@@ -2,7 +2,7 @@ from app.settings import TOKEN
 import logging
 
 from telegram.ext import Updater
-from app.dialogs import new, delete, view
+from app.dialogs import new, delete, view, edit, play
 
 
 # Enable logging
@@ -20,6 +20,8 @@ def main() -> None:
     dispatcher.add_handler(new.conv_handler)
     dispatcher.add_handler(delete.conv_handler)
     dispatcher.add_handler(view.conv_handler)
+    dispatcher.add_handler(edit.conv_handler)
+    dispatcher.add_handler(play.conv_handler)
 
     updater.start_polling()
     updater.idle()

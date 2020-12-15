@@ -96,5 +96,12 @@ def get_item_for_user_card(db: Session, telegram_id: str, card_name: str, questi
     return db.query(models.Item).filter_by(card_id=card_id).filter_by(question=question).first()
 
 
+def delete_item(db: Session, telegram_id: str, card_name: str, question: str):
+    card_id = get_card_id_by_name(db=db, telegram_id=telegram_id, card_name=card_name).id
+    query = db.query(models.Item).filter_by(card_id=card_id).filter_by(question=question).delete()
+    db.commit()
+    return query
+
+
 def get_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Item).offset(skip).limit(limit).all()

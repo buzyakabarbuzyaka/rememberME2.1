@@ -36,11 +36,7 @@ services:
       context: .
     links:
       - user-db
-    depends_on:
-      - user-db
     restart: always
-    ports:
-      - "${APP_PORT}:${APP_PORT}"
     env_file:
       - .env
       - .secret_base
@@ -49,6 +45,7 @@ services:
       - ./app:/app
     networks:
       - stat_network
+
 networks:
   stat_network:
     name: stat_network

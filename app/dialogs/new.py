@@ -152,9 +152,6 @@ def creating_answer(update: Update, context: CallbackContext):
         return item_creation_decision(update, context)
 
 
-
-
-
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('new', start_new)],
     states={

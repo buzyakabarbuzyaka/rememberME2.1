@@ -34,7 +34,7 @@ class Item(Base):
 
     card = relationship("Card", back_populates="items", passive_deletes=False)
 
-
+Base.metadata.create_all(bind=engine)
 if __name__ == '__main__':
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
