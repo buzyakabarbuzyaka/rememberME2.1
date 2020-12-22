@@ -13,22 +13,20 @@ services:
     networks:
       - stat_network
 
-  user-stat:
-    build:
-      dockerfile: Dockerfile.server
-      context: .
-    links:
-      - user-db
-    restart: always
-    ports:
-      - "${APP_PORT}:${APP_PORT}"
-    env_file:
-      - .env
-      - .secret_base
-    volumes:
-      - ./app:/app
-    networks:
-      - stat_network
+#  user-stat:
+#    build:
+#      dockerfile: Dockerfile.server
+#      context: .
+#    links:
+#      - user-db
+#    restart: always
+#    ports:
+#      - "${APP_PORT}:${APP_PORT}"
+#    env_file:
+#      - .env
+#      - .secret_base
+#    networks:
+#      - stat_network
 
   user-bot:
     build:
@@ -41,8 +39,6 @@ services:
       - .env
       - .secret_base
       - .secret_bot
-    volumes:
-      - ./app:/app
     networks:
       - stat_network
 
